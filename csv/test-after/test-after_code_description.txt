@@ -1,0 +1,5 @@
+Target,Distractor,Hemifield,Code
+faces,objects,Left,1
+faces,objects,Right,2
+objects,faces,Left,3
+objects,faces,Right,4
