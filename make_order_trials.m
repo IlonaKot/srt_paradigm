@@ -24,6 +24,14 @@ function make_order_trials(subid, cfg)
 % Output
 %       csv files under ./csv/subid/
 %       a txt file under ./csv/subid/ containing the codes for each condition
+%
+% Example:
+%    subid = 'test_after';
+%    cfg = [];
+%    cfg.stimulitxt = {'faces.txt', 'objects.txt'};
+%    cfg.stimulitype = {'faces', 'objects'};
+%    cfg.blocklength = 50;
+%    make_order_trials(subid, cfg);
 
 % MVdOC Jan 15
 

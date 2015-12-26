@@ -26,6 +26,15 @@ DEBUG = 0;
 DIST_CM = 50;  % distance subject-screen in cm
 SCREEN_W_CM = 36.5;  % width of the screen in cm
 
+% are we using a mac?
+if strcmp(computer, 'MACI64')
+    RESOLUTION = [800 600 0];
+    ACTUAL_REFRESH = 60; %for stupid macs
+else  % CCNL's lab eye tracker
+    RESOLUTION = [800 600 85];
+    ACTUAL_REFRESH = RESOLUTION(3);
+end
+
 if DEBUG
     EYE_USED = 0;
 else
@@ -44,15 +53,6 @@ FIX_CROSS_SIZE_DEG = [2 2];  % width, height
 BG_COLOR = [128, 128, 128];
 % Maximum allowed distance from fixation
 MAX_DIST_FIXATION_DEG = 2;  % considering possible errors of calibration of max 1 deg
-
-% are we using a mac?
-if strcmp(computer, 'MACI64')
-    RESOLUTION = [800 600 0];
-    ACTUAL_REFRESH = 60; %for stupid macs
-else  % CCNL's lab eye tracker
-    RESOLUTION = [800 600 85];
-    ACTUAL_REFRESH = RESOLUTION(3);
-end
 
 % compute conversion factor visual angle --> pixel
 DEG2P = angle2pix(1, DIST_CM, SCREEN_W_CM, RESOLUTION(1));

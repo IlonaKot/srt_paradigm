@@ -2,12 +2,12 @@ function out = multi_randperm(n, m)
 % MULTI_RANDPERM returns a random permutation of 1:n repeated m times.
 %
 % example:
-% >> rng(1)  % for reproducibility of the example
-% >> multi_randperm(3, 2)
+%   rng(1)  % for reproducibility of the example
+%   multi_randperm(3, 2)
 %
-% ans =
+%   ans =
 %
-%      3     1     2     2     3     1
+%        3     1     2     2     3     1
 
 out = zeros([1, n*m]);
 idx = 0 : n : n*m;
