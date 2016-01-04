@@ -9,6 +9,9 @@ Castello, M., & Gobbini, M. I. (2015). Familiar Face Detection in 180ms.
 PLoS ONE, 10(8), e0136548.
 http://doi.org/10.1371/journal.pone.0136548.s010*.
 
+If you use this code, please acknowledge the original paper that introduced 
+the paradigm, and share your improvements with pull requests.
+
 # General requirements
 The code requires
 
