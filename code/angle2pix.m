@@ -17,6 +17,7 @@ function pix = angle2pix(ang, dist_cm, screen_w_cm, resolution_x)
 
 %Written 11/1/07 gmb zre
 % 1/30/15 cleaned code MVdOC
+% Credits to Alireza Soltani's codebase
 
 % compute conversion factor cm to pixels
 cm2pix = resolution_x/screen_w_cm;  %[pix/cm]
