@@ -1,8 +1,9 @@
 This is my code for the Saccadic Reaction Time paradigm, as first
 introduced by [Sébastien M. Crouzet](https://scrouzet.github.io/) et al.
-in this paper *Crouzet, S. M., Kirchner, H., & Thorpe, S. J. (2010). Fast
+in his paper *Crouzet, S. M., Kirchner, H., & Thorpe, S. J. (2010). Fast
 saccades toward faces: face detection in just 100 ms. Journal of Vision,
-10(4), 16.1–17. http://doi.org/10.1167/10.4.16*. I used this code to
+10(4), 16.1–17. http://doi.org/10.1167/10.4.16*. 
+I used this code to
 test our setup for our work on familiar faces, *Visconti di Oleggio
 Castello, M., & Gobbini, M. I. (2015). Familiar Face Detection in 180ms.
 PLoS ONE, 10(8), e0136548.
@@ -14,7 +15,7 @@ The code requires
 - Psychtoolbox 3 (the code was run with version 3.0.11)
 - MATLAB (tested with version 2014b. It might work with octave, but I
   haven't tried it)
-- **Eyelink Plus 1000** system--the code needs to be modified if you
+- **Eyelink Plus 1000** system—the code needs to be modified if you
   plan to use it with other eye-tracking systems.
 
 Also, you won't find stimuli in this repository as I do not have the
@@ -49,7 +50,7 @@ all the directories to the matlab path. Alternatively, you need to fix
 `setupExp.m`.**
 
 ## `setupExp.m`
-Here you should only change what is between lines 23--44, in particular
+Here you should only change what is between lines 23–44, in particular
 the distance of the subject from the screen `DIST_CM`, the width of the
 screen `SCREEN_W_CM`, and the resolution and refresh rate of your system
 `RESOLUTION`.
@@ -95,7 +96,7 @@ To generate the CSV files with this function, you need the following:
         a txt file under ./csv/subid/ containing the codes for each condition
 ```
 
-Note that it checks that the stimuli exist under `./stim/`--better to fail 
+Note that it checks that the stimuli exist under `./stim/`—better to fail 
 early that during the experiment. As an example of the output, see the
 files contained in `csv/test-after/`. Those where generated running
 the function in the following way (again, if you do not have the stimuli
