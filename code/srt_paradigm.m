@@ -337,9 +337,9 @@ try
         if 2==exist([edf_fn, '.edf'], 'file')
             edf_fn_moved = [sprintf('%02d_', blocknr), ...
                 strrep(block, '.csv', '.edf')];
-            movefile(edf_fn, fullfile(EDF_RESDIR, edf_fn_moved));
+            movefile([edf_fn, '.edf'], fullfile(EDF_RESDIR, edf_fn_moved));
             fprintf('Data file can be found in ''%s''\n', ...
-                edf_fn_moved );
+                fullfile(EDF_RESDIR, edf_fn_moved));
         end
     catch rdf
         fprintf('Problem receiving data file ''%s''\n', edf_fn );
