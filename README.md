@@ -9,6 +9,9 @@ Castello, M., & Gobbini, M. I. (2015). Familiar Face Detection in 180ms.
 PLoS ONE, 10(8), e0136548.
 http://doi.org/10.1371/journal.pone.0136548.s010*.
 
+If you use this code, please acknowledge the original paper that introduced 
+the paradigm, and share your improvements with pull requests.
+
 # General requirements
 The code requires
 
@@ -179,3 +182,26 @@ sentinels:
 Eyelink('Message', sprintf('Trial %d Code %s: STIM ON', itrl, ...
         output{1+itrl, 7}));
 ```
+
+The parser will generate a structure whose design is inspired by the 
+[Fieldtrip toolbox](http://www.fieldtriptoolbox.org):
+
+```
+s = 
+
+         dimord: 'trl_sample_x_y_na'
+            fix: {1x162 cell}
+          blank: {1x162 cell}
+           stim: {1x162 cell}
+      trialinfo: [1x162 double]
+        targets: {162x1 cell}
+    distractors: {162x1 cell}
+```
+
+each of the fields `fix`, `blank` and `stim` contain the x, y position of the eye 
+(and the pupil area, I believe) over time in the respective conditions: initial fixation, 
+blank period, and stimulus presentation. Each element represents a single trial, whose
+code is stored in `trialinfo`, with `targets` and `distractors` in the respective fields.
+To sum up, for trial `i`, the code of that trial is in `s.trialinfo(i)`, the target was
+`s.targets{i}` and the distractor `s.distractors{i}`; the position of the eye is stored in
+`s.stim{i}`.
