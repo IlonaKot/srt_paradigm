@@ -1,7 +1,7 @@
 function srt_paradigm(subid, subnr, blocknr)
 % SRT_PARADIGM(subid, subnr, blocknr)
 %
-% Main script to run the SRT paraadigm introduced by Crouzet et al., 2010.
+% Main script to run the SRT paradigm introduced by Crouzet et al., 2010.
 % You need to specify an existing subid, with existing CSV trial order,
 % its subject number (subnr, for filename purposes for the eye tracker),
 % and the number of the block.
@@ -12,8 +12,8 @@ end
 % close everything just in case
 Screen('CloseAll');
 
-% test we're running with OpenGL
-AssertOpenGL;
+% default settings
+PsychDefaultSetup(2);
 
 % load setup for the experiment
 setupExp;
@@ -73,10 +73,12 @@ tmp = regexp(block, 'dis-(.*?)_', 'tokens');
 block_dis = tmp{1}{1}; 
 
 % TEXT TO DISPLAY AT THE BEGINNING OF THE EXPERIMENT
-if strcmp(block_tar, 'face')
+if strcmp(block_tar, 'faces')
     texttarget = '\nthe faces';
 elseif strcmp(block_tar, 'objects')
     texttarget = '\nthe objects';
+else
+    error('I know only faces and objects, got %s', block_tar);
 end
 
 % load block
@@ -126,10 +128,7 @@ cell2csv(resultsfn, output);
 
 % open screen and setup PTB
 try
-    if ~DEBUG
-        HideCursor;
-    end
-    KbName('UnifyKeyNames');
+    % call kbcheck once to speed callings
     KbCheck;
 
     screens = Screen('Screens');
@@ -138,9 +137,31 @@ try
     oldRes = SetResolution(screenNumber, RESOLUTION(1), RESOLUTION(2), ...
                            RESOLUTION(3));
     [expWin,rect] = Screen('OpenWindow', screenNumber, BG_COLOR);
+    if ~DEBUG
+        HideCursor(screenNumber);
+    end
     
     % get the midpoint (mx, my) of this window, x and y
     [mx, my] = RectCenter(rect);
+    
+    % ----- TIMING STUFF ------
+    % get flip interval
+    ifi = Screen('GetFlipInterval', expWin);
+    
+    % Numer of frames to wait when specifying good timing
+    waitframes = 1;
+    
+    % period timings
+    blank1Secs = .2;
+    blank1Frames = round(blank1Secs/ifi);
+    blank2Secs = 1;
+    blank2Frames = round(blank2Secs/ifi);
+    stimSecs = .4;
+    stimFrames = round(stimSecs/ifi);    
+    % ----- END TIMING STUFF ----
+    
+    % Retreive the maximum priority number
+    topPriorityLevel = MaxPriority(expWin);
     
     % stimuli rectangles
     stimulus_rect = [0 0 STIM_SIZE_PIX]; 
@@ -233,6 +254,7 @@ try
     
     Eyelink('Message', sprintf('BLOCK %d %s SUBJECT %02d: START', ...
         blocknr, block_tar, subnr));
+    Priority(topPriorityLevel);
     for itrl = 1:ntrl
         Eyelink('Message', ... 
             sprintf('Trial %d Code %s: START Target: %s Distractor: %s', ...
@@ -242,7 +264,7 @@ try
         % blank for 1000ms
         Eyelink('Message', sprintf('Trial %d Code %s: BLANK1 ON', itrl, ...
             output{1+itrl, 7}));
-        tblank = Screen('Flip', expWin);
+        vbl = Screen('Flip', expWin);
         
         % load stimuli
         target = imread(fullfile(STIMDIR, output{itrl+1, 3}));
@@ -253,21 +275,20 @@ try
         
         % fixation cross for jittered period 
         Screen('DrawTexture', expWin, fixcross);
-        [VBLTimestamp, StimulusOnsetTime, FlipTimestamp] = ...
-            Screen('Flip', expWin, tblank + 1);
+        vbl = Screen('Flip', expWin, vbl + (waitframes*blank1Frames - 0.5)*ifi);
         Eyelink('Message', sprintf('Trial %d Code %s: BLANK1 OFF', itrl, ...
             output{1+itrl, 7}));
-        
-        
         Eyelink('Message', sprintf('Trial %d Code %s: FIXATION ON', itrl, ...
             output{1+itrl, 7}));
         
+        % jitter
         jitt = output{itrl+1, 8};
-        jitt_flips = round(jitt/FLIP_DURATION_MS);
+        jittFrames = round(jitt/1000/ifi);
+        
         
         Screen('DrawTexture', expWin, fixcross);
         count_fixation = 1; % we want the subject to fixate for this much
-        while count_fixation < jitt_flips
+        while count_fixation < jittFrames - 1
            % get position of the eye -- fixation cross is already on
            [trueEyePos, dist, rawEyePos] = ...
                getEyePos(mx, my, EYE_USED, DEBUG, expWin);
@@ -282,11 +303,11 @@ try
                count_fixation = 1;
            end
            % draw fixation cross again
-           Screen('Flip', expWin, [], 1);
+           vbl = Screen('Flip', expWin, vbl + (waitframes - 0.5)*ifi, 1);
         end
-        
-        [VBLTimestamp, StimulusOnsetTime, FlipTimestamp] = ...
-            Screen('Flip', expWin, StimulusOnsetTime + jitt/1000);
+        vbl = Screen('Flip', expWin, vbl + (waitframes - 0.5)*ifi);
+        %[VBLTimestamp, StimulusOnsetTime, FlipTimestamp] = ...
+        %    Screen('Flip', expWin, StimulusOnsetTime + jitt/1000);
         Eyelink('Message', sprintf('Trial %d Code %s: FIXATION OFF', itrl, ...
             output{1+itrl, 7}));
         Eyelink('Message', sprintf('Trial %d Code %s: BLANK2 ON', itrl, ...
@@ -304,23 +325,30 @@ try
             Screen('DrawTexture', expWin, targetTexture, [], ...
                 rectleft);
         end
-        [VBLTimestamp, StimulusOnsetTime, FlipTimestamp] = ...
-            Screen('Flip', expWin, StimulusOnsetTime + 0.2);
+        vbl = Screen('Flip', expWin, vbl + (waitframes * blank2Frames - 0.5) * ifi);
+        if DEBUG
+            stimOn = vbl;
+        end
         Eyelink('Message', sprintf('Trial %d Code %s: BLANK2 OFF', itrl, ...
             output{1+itrl, 7}));
         Eyelink('Message', sprintf('Trial %d Code %s: STIM ON', itrl, ...
             output{1+itrl, 7}));
-        % stimuli for 400ms
-        [VBLTimestamp, StimulusOnsetTime, FlipTimestamp] = ...
-            Screen('Flip', expWin, StimulusOnsetTime + 0.4);
-         Eyelink('Message', sprintf('Trial %d Code %s: STIM OFF', itrl, ...
+        vbl = Screen('Flip', expWin, vbl + (waitframes * stimFrames - 0.5) * ifi);
+        if DEBUG
+            stimOff = vbl;
+            fprintf('Stimulus on for %.5f secs\n', stimOff-stimOn);
+        end
+        Eyelink('Message', sprintf('Trial %d Code %s: STIM OFF', itrl, ...
             output{1+itrl, 7}));
-        
+
         % clear stimuli textures     
         Screen('Close', [targetTexture, distrTexture]);
         Eyelink('Message', sprintf('Trial %d Code %s: DONE', itrl, ...
             output{1+itrl, 7}));
     end % trl for loop
+    %reset priority
+    Priority(0);
+    
     Eyelink('Message', sprintf('BLOCK %d %s SUBJECT %02d: DONE', ...
         blocknr, block_tar, subnr));
     % get data from eyetracker

@@ -59,4 +59,6 @@ DEG2P = angle2pix(1, DIST_CM, SCREEN_W_CM, RESOLUTION(1));
 
 if DEBUG
     Screen('Preference', 'SkipSyncTests', 1);
+else
+    Screen('Preference', 'SkipSyncTests', 0)
 end
