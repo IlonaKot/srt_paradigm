@@ -152,10 +152,10 @@ try
     waitframes = 1;
     
     % period timings
-    blank1Secs = .2;
-    blank1Frames = round(blank1Secs/ifi);
-    blank2Secs = 1;
-    blank2Frames = round(blank2Secs/ifi);
+    blank1Secs = 1;
+    blank1Frames = round(blank2Secs/ifi);
+    blank2Secs = .2;
+    blank2Frames = round(blank1Secs/ifi);
     stimSecs = .4;
     stimFrames = round(stimSecs/ifi);    
     % ----- END TIMING STUFF ----
