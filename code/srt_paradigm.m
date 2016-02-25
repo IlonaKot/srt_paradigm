@@ -153,9 +153,9 @@ try
     
     % period timings
     blank1Secs = 1;
-    blank1Frames = round(blank2Secs/ifi);
+    blank1Frames = round(blank1Secs/ifi);
     blank2Secs = .2;
-    blank2Frames = round(blank1Secs/ifi);
+    blank2Frames = round(blank2Secs/ifi);
     stimSecs = .4;
     stimFrames = round(stimSecs/ifi);    
     % ----- END TIMING STUFF ----
@@ -265,6 +265,9 @@ try
         Eyelink('Message', sprintf('Trial %d Code %s: BLANK1 ON', itrl, ...
             output{1+itrl, 7}));
         vbl = Screen('Flip', expWin);
+        if DEBUG
+            blank1On = vbl;
+        end
         
         % load stimuli
         target = imread(fullfile(STIMDIR, output{itrl+1, 3}));
@@ -276,6 +279,10 @@ try
         % fixation cross for jittered period 
         Screen('DrawTexture', expWin, fixcross);
         vbl = Screen('Flip', expWin, vbl + (waitframes*blank1Frames - 0.5)*ifi);
+        if DEBUG
+            blank1Off = vbl;
+            fprintf('Blank 1 on for %.5f secs\n', blank1Off-blank1On);
+        end
         Eyelink('Message', sprintf('Trial %d Code %s: BLANK1 OFF', itrl, ...
             output{1+itrl, 7}));
         Eyelink('Message', sprintf('Trial %d Code %s: FIXATION ON', itrl, ...
@@ -292,10 +299,10 @@ try
            % get position of the eye -- fixation cross is already on
            [trueEyePos, dist, rawEyePos] = ...
                getEyePos(mx, my, EYE_USED, DEBUG, expWin);
-           if DEBUG
-               fprintf('trueEyePos: %.2f %.2f; dist: %.2f\n', ...
-                   trueEyePos, dist);
-           end
+%            if DEBUG
+%                fprintf('trueEyePos: %.2f %.2f; dist: %.2f\n', ...
+%                    trueEyePos, dist);
+%            end
            % check if it's within the range
            if dist <= MAX_DIST_FIXATION_PIX
                count_fixation = count_fixation + 1;
@@ -303,9 +310,15 @@ try
                count_fixation = 1;
            end
            % draw fixation cross again
-           vbl = Screen('Flip', expWin, vbl + (waitframes - 0.5)*ifi, 1);
+           Screen('DrawTexture', expWin, fixcross);
+           vbl = Screen('Flip', expWin, vbl + (waitframes - 0.5)*ifi);
         end
+        % remove fixation
         vbl = Screen('Flip', expWin, vbl + (waitframes - 0.5)*ifi);
+        if DEBUG
+            fixOff = vbl;
+            fprintf('Fixation on for %.5f secs\n', fixOff-blank1Off);
+        end
         %[VBLTimestamp, StimulusOnsetTime, FlipTimestamp] = ...
         %    Screen('Flip', expWin, StimulusOnsetTime + jitt/1000);
         Eyelink('Message', sprintf('Trial %d Code %s: FIXATION OFF', itrl, ...
@@ -328,6 +341,7 @@ try
         vbl = Screen('Flip', expWin, vbl + (waitframes * blank2Frames - 0.5) * ifi);
         if DEBUG
             stimOn = vbl;
+            fprintf('Blank2 on for %.5f secs\n', stimOn-fixOff);
         end
         Eyelink('Message', sprintf('Trial %d Code %s: BLANK2 OFF', itrl, ...
             output{1+itrl, 7}));
